@@ -16,7 +16,6 @@ mode = st.sidebar.selectbox("Select Mode", ["Single Equation", "Simultaneous", "
 elif mode == "Simultaneous":
     st.header("Solve $ax + by = c$ and $dx + ey = f$")
     
-    # Input section
     col1, col2 = st.columns(2)
     with col1:
         a = st.number_input("a", value=2.0, key="a2")
@@ -28,42 +27,52 @@ elif mode == "Simultaneous":
         f = st.number_input("f", value=3.0, key="f2")
 
     if st.button("Solve System", key="btn_sim"):
-        # Calculate Determinant
         D = (a * e) - (b * d)
         
         if D != 0:
-            # Cramer's Rule for intersection
             x_res = ((c * e) - (b * f)) / D
             y_res = ((a * f) - (c * d)) / D
-            
             st.success(f"Results: $x = {round(x_res, 4)}$, $y = {round(y_res, 4)}$")
 
-            # --- Graphing Logic ---
             fig, ax = plt.subplots(figsize=(8, 8))
             
-            # 1. Determine Zoom (Force at least -10 to 10 view)
+            # Symmetrical limits to force (0,0) to be dead center
             limit = max(abs(x_res), abs(y_res), 10) + 2
             x_vals = np.linspace(-limit, limit, 400)
 
-            # 2. Centering the Axes (The "Four Quadrant" look)
+            # Move axes to the center to create 4 distinct quadrants
             ax.spines['left'].set_position('zero')
             ax.spines['bottom'].set_position('zero')
             ax.spines['right'].set_color('none')
             ax.spines['top'].set_color('none')
 
-            # 3. Plot Line 1 (Handles vertical lines)
+            # Plot Line 1
             if b != 0:
                 y1 = (c - a * x_vals) / b
                 ax.plot(x_vals, y1, label=f'${a}x + {b}y = {c}$', linewidth=2)
             else:
-                ax.axvline(x=c/a, label=f'${a}x = {c}$', color='blue', linewidth=2)
+                ax.axvline(x=c/a, color='blue', label=f'${a}x = {c}$', linewidth=2)
 
-            # 4. Plot Line 2 (Handles vertical lines)
+            # Plot Line 2
             if e != 0:
                 y2 = (f - d * x_vals) / e
                 ax.plot(x_vals, y2, label=f'${d}x + {e}y = {f}$', linewidth=2)
             else:
-                ax.axvline(x=f/d, label=f'${d}x = {
+                ax.axvline(x=f/d, color='orange', label=f'${d}x = {f}$', linewidth=2)
+
+            # Mark intersection
+            ax.plot(x_res, y_res, 'ro', markersize=8, label='Solution', zorder=5)
+
+            # Lock in the zoomed-out, centered view
+            ax.set_xlim(-limit, limit)
+            ax.set_ylim(-limit, limit)
+            ax.set_aspect('equal')
+            ax.grid(True, linestyle='--', alpha=0.5)
+            ax.legend(loc='upper right')
+            
+            st.pyplot(fig)
+        else:
+            st.error("Lines are parallel or collinear (no unique solution).")
 elif mode == "Trigonometry":
     st.header("Solve trigonometric functions")
     trigfunc = st.selectbox("Choose function", ["sine", "cosine", "tangent", "inverse sine", "inverse cosine", "inverse tangent"])
@@ -285,6 +294,7 @@ elif mode == "Unit Conversion":
         if st.button("Convert", key="btn_data"):
             result = (input_value * data_units[from_unit]) / data_units[to_unit]
             st.success(f"### {input_value} {from_unit} = {result:.2f} {to_unit}")
+
 
 
 
