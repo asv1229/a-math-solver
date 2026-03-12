@@ -13,6 +13,19 @@ st.title("Math Solver")
 
 mode = st.sidebar.selectbox("Select Mode", ["Single Equation", "Simultaneous", "Trigonometry", "Quadratics", "Calculus", "Statistics", "Unit Conversion"])
 
+if mode == "Single Equation":
+    st.header("Solve $ax + b = c$")
+    a = st.number_input("Value for a", value=0.0, key="a1")
+    b = st.number_input("Value for b", value=0.0, key="b1")
+    c = st.number_input("Value for c", value=0.0, key="c1")
+
+    if st.button("Solve Single", key="btn_single"):
+        if a == 0:
+            st.error("a cannot be zero!")
+        else:
+            x = (c - b) / a
+            st.success(f"Result: $x = {round(x, 4)}$")
+            
 if mode == "Simultaneous":
     st.header("Solve $ax + by = c$ and $dx + ey = f$")
     
@@ -294,6 +307,7 @@ elif mode == "Unit Conversion":
         if st.button("Convert", key="btn_data"):
             result = (input_value * data_units[from_unit]) / data_units[to_unit]
             st.success(f"### {input_value} {from_unit} = {result:.2f} {to_unit}")
+
 
 
 
